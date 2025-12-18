@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="pixel-logo-container">
                     <div class="star-field" id="star-field"></div>
                     <div class="text-container">
-                        <div class="welcome-text typing">${matrixText}</div>
+                        <div class="welcome-text">${matrixText}</div>
                     </div>
                 </div>
             </div>
@@ -120,28 +120,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Generate star field
     generateStarField();
     
-    // Start with white text; begin RGB cycle after typing animation completes
+    // Start RGB color cycling and shooting stars immediately
     const welcomeTextEl = document.querySelector('.welcome-text');
     if (welcomeTextEl) {
-        welcomeTextEl.addEventListener('animationend', function(e) {
-            if (e.animationName === 'typing') {
-                setTimeout(() => {
-                    const matrixChars = welcomeTextEl.querySelectorAll('.matrix-char');
-                    matrixChars.forEach((node, index) => {
-                        node.classList.add('rgb-on');
-                        // Random duration between 2-4 seconds
-                        const duration = 2 + Math.random() * 2;
-                        // Delay based on character position plus some randomness
-                        const delay = (index * 0.1) + (Math.random() * 0.5);
-                        node.style.animationDuration = duration + 's';
-                        node.style.animationDelay = delay + 's';
-                    });
-                    
-                    // Start shooting stars after layout is stable
-                    startShootingStars();
-                }, 300);
-            }
-        }, { once: true });
+        setTimeout(() => {
+            const matrixChars = welcomeTextEl.querySelectorAll('.matrix-char');
+            matrixChars.forEach((node, index) => {
+                node.classList.add('rgb-on');
+                // Random duration between 2-4 seconds
+                const duration = 2 + Math.random() * 2;
+                // Delay based on character position plus some randomness
+                const delay = (index * 0.1) + (Math.random() * 0.5);
+                node.style.animationDuration = duration + 's';
+                node.style.animationDelay = delay + 's';
+            });
+
+            // Start shooting stars after layout is stable
+            startShootingStars();
+        }, 300);
     }
     
     // Handle keyboard input
