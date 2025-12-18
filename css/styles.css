@@ -683,6 +683,7 @@ body {
         cursor: text;
         position: relative;
         z-index: 10;
+        transition: background-color 0.2s ease;
     }
 
     #current-command:focus {
@@ -691,10 +692,20 @@ body {
         outline-offset: 1px;
     }
 
-    /* Ensure contenteditable works properly on mobile */
-    #current-command:empty:before {
-        content: attr(placeholder);
-        color: #666;
+    /* Ensure proper cursor visibility on mobile */
+    .cursor {
+        width: 3px;
+        background-color: #00ff00;
+        display: inline-block;
+        vertical-align: text-bottom;
+        margin-left: 1px;
+    }
+
+    /* Hidden mobile input styling */
+    #mobile-input {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
         pointer-events: none;
     }
 }

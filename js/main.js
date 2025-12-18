@@ -25,6 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return document.getElementById('current-command');
     }
 
+    // Get the mobile input element
+    function getMobileInputElement() {
+        return document.getElementById('mobile-input');
+    }
+
     // Get the current command text
     function getCurrentCommandText() {
         const element = getCurrentCommandElement();
@@ -41,6 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update command text with cursor position
     function updateCommandText(text, position = null) {
         const element = getCurrentCommandElement();
+        const mobileInputElement = getMobileInputElement();
+
         if (element) {
             if (position !== null) {
                 cursorPosition = Math.max(0, Math.min(position, text.length));
@@ -54,6 +61,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Use innerHTML to properly render the cursor
             element.innerHTML = beforeCursor + '<span class="cursor"></span>' + afterCursor;
+
+            // Sync mobile input field
+            if (mobileInputElement && mobileInputElement.value !== text) {
+                mobileInputElement.value = text;
+            }
         }
     }
 
@@ -95,7 +107,8 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="command-line">
             <span class="prompt">$</span>
-            <span id="current-command" contenteditable="true" tabindex="0" role="textbox" aria-label="Terminal command input" placeholder="Type a command..."></span>
+            <span id="current-command"></span>
+            <input type="text" id="mobile-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;">
         </div>
     `;
     
@@ -224,45 +237,103 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Make the current command element focusable and handle mobile keyboard
+    // Set up mobile input handling
     const currentCommandElement = getCurrentCommandElement();
-    if (currentCommandElement) {
+    const mobileInputElement = getMobileInputElement();
+
+    if (currentCommandElement && mobileInputElement) {
+        // Make current command element focusable for accessibility
         currentCommandElement.setAttribute('tabindex', '0');
+        currentCommandElement.setAttribute('role', 'textbox');
+        currentCommandElement.setAttribute('aria-label', 'Terminal command input');
 
-        // Handle mobile keyboard focus and input
-        currentCommandElement.addEventListener('focus', function() {
-            // Ensure cursor is visible when focused
-            updateCommandText(getCurrentCommandText(), getCurrentCommandText().length);
+        // Handle mobile input events
+        mobileInputElement.addEventListener('input', function(e) {
+            const text = e.target.value;
+            updateCommandText(text, text.length);
         });
 
-        currentCommandElement.addEventListener('blur', function() {
-            // Save current cursor position when losing focus
-            const text = getCurrentCommandText();
-            cursorPosition = text.length;
-        });
+        mobileInputElement.addEventListener('keydown', function(e) {
+            // Handle special keys
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const commandText = getCurrentCommandText().trim();
 
-        // Handle touch events for mobile
-        currentCommandElement.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            this.focus();
-            // Ensure the soft keyboard appears
-            if (typeof this.select === 'function') {
-                this.select();
+                // Trigger the same logic as desktop keyboard input
+                commandHistory.push(commandText);
+                currentCommand = commandHistory.length;
+
+                preserveCurrentCommand(terminal);
+                const output = executeCommand(commandText, commands);
+
+                if (commandText === 'clear') {
+                    const commandOutputs = terminal.querySelectorAll('.command-output:not(:first-child)');
+                    commandOutputs.forEach(output => output.remove());
+                    const commandLines = terminal.querySelectorAll('.command-line');
+                    commandLines.forEach(line => line.remove());
+                } else if (commandText === 'easy_mode') {
+                    window.location.href = '../Simpler-Portfolio/Simple.html';
+                    return;
+                } else if (output) {
+                    const executedCommand = terminal.querySelector('.command-line.executed:last-child');
+                    if (executedCommand) {
+                        executedCommand.insertAdjacentHTML('afterend', output);
+                    } else {
+                        terminal.insertAdjacentHTML('beforeend', output);
+                    }
+                    window.terminalUtils.smartAutoScrollWithContentDetection();
+                }
+
+                addNewCommandLine(terminal);
+                cursorPosition = 0;
+                window.terminalUtils.scrollToBottom();
+
+                // Clear mobile input
+                e.target.value = '';
+            } else if (e.key === 'Backspace') {
+                // Let the input handle backspace naturally
+                setTimeout(() => {
+                    const text = e.target.value;
+                    updateCommandText(text, text.length);
+                }, 1);
             }
         });
 
-        // Force focus on click/tap
+        // Handle focus management - focus hidden mobile input when terminal is clicked
         currentCommandElement.addEventListener('click', function(e) {
             e.preventDefault();
-            this.focus();
+            mobileInputElement.focus();
         });
-    }
 
-    // Auto-focus the command input for mobile
-    if ('ontouchstart' in window) {
-        setTimeout(() => {
-            currentCommandElement.focus();
-        }, 500);
+        currentCommandElement.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            mobileInputElement.focus();
+        });
+
+        // Sync focus states
+        mobileInputElement.addEventListener('focus', function() {
+            currentCommandElement.style.backgroundColor = 'rgba(39, 201, 63, 0.05)';
+            updateCommandText(this.value, this.value.length);
+        });
+
+        mobileInputElement.addEventListener('blur', function() {
+            currentCommandElement.style.backgroundColor = 'transparent';
+            cursorPosition = this.value.length;
+        });
+
+        // Focus terminal on click anywhere
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.terminal') && !e.target.closest('.mode-button') && !e.target.closest('.link')) {
+                mobileInputElement.focus();
+            }
+        });
+
+        // Auto-focus on mobile
+        if ('ontouchstart' in window) {
+            setTimeout(() => {
+                mobileInputElement.focus();
+            }, 500);
+        }
     }
 });
 
