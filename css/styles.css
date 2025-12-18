@@ -647,7 +647,7 @@ body {
     }
 }
 
-/* Remove focus styling from command input */
+/* Command input styling */
 #current-command {
     outline: none;
     border: none;
@@ -655,6 +655,13 @@ body {
     color: inherit;
     font-family: inherit;
     font-size: inherit;
+    caret-color: #e0e0e0; /* Cursor color */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    display: inline-block;
+    width: 100%;
+    min-width: 1px; /* Ensure it's clickable */
 }
 
 #current-command:focus {
@@ -666,6 +673,30 @@ body {
 /* Remove any default styling from focusable elements */
 #current-command:focus-visible {
     outline: none;
+}
+
+/* Mobile input improvements */
+@media (hover: none) and (pointer: coarse) {
+    #current-command {
+        min-height: 24px;
+        padding: 2px 0;
+        cursor: text;
+        position: relative;
+        z-index: 10;
+    }
+
+    #current-command:focus {
+        background-color: rgba(39, 201, 63, 0.05);
+        outline: 1px solid rgba(39, 201, 63, 0.3);
+        outline-offset: 1px;
+    }
+
+    /* Ensure contenteditable works properly on mobile */
+    #current-command:empty:before {
+        content: attr(placeholder);
+        color: #666;
+        pointer-events: none;
+    }
 }
 
 /* Scrollbar styling */

@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="command-line">
             <span class="prompt">$</span>
-            <span id="current-command"></span>
+            <span id="current-command" contenteditable="true" tabindex="0" role="textbox" aria-label="Terminal command input" placeholder="Type a command..."></span>
         </div>
     `;
     
@@ -224,10 +224,45 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Make the current command element focusable
+    // Make the current command element focusable and handle mobile keyboard
     const currentCommandElement = getCurrentCommandElement();
     if (currentCommandElement) {
         currentCommandElement.setAttribute('tabindex', '0');
+
+        // Handle mobile keyboard focus and input
+        currentCommandElement.addEventListener('focus', function() {
+            // Ensure cursor is visible when focused
+            updateCommandText(getCurrentCommandText(), getCurrentCommandText().length);
+        });
+
+        currentCommandElement.addEventListener('blur', function() {
+            // Save current cursor position when losing focus
+            const text = getCurrentCommandText();
+            cursorPosition = text.length;
+        });
+
+        // Handle touch events for mobile
+        currentCommandElement.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            this.focus();
+            // Ensure the soft keyboard appears
+            if (typeof this.select === 'function') {
+                this.select();
+            }
+        });
+
+        // Force focus on click/tap
+        currentCommandElement.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.focus();
+        });
+    }
+
+    // Auto-focus the command input for mobile
+    if ('ontouchstart' in window) {
+        setTimeout(() => {
+            currentCommandElement.focus();
+        }, 500);
     }
 });
 
