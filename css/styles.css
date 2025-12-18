@@ -1133,3 +1133,40 @@ body {
         display: flex;
     }
 }
+
+/* Fixed welcome header on mobile */
+@media (max-width: 768px) {
+    .terminal-body {
+        padding-top: 0;
+        position: relative;
+    }
+
+    .command-output:first-child {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #0d1117;
+        padding: 0.5rem 0;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #27c93f;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+
+    .command-output:first-child .welcome-container {
+        position: relative;
+        z-index: 101;
+    }
+
+    /* Add padding to content after the welcome section */
+    .command-output:not(:first-child) {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Ensure command lines are below the fixed header */
+    .command-line {
+        position: relative;
+        z-index: 1;
+    }
+}
