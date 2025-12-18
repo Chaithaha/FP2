@@ -323,8 +323,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Focus terminal on click anywhere
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.terminal') && !e.target.closest('.mode-button') && !e.target.closest('.link')) {
-                mobileInputElement.focus();
+            const currentMobileInput = document.getElementById('mobile-input');
+            if (e.target.closest('.terminal') && !e.target.closest('.mode-button') && !e.target.closest('.link') && currentMobileInput) {
+                currentMobileInput.focus();
             }
         });
 
@@ -335,6 +336,119 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         }
     }
+
+    // Global function to ensure mobile input is always properly set up
+    window.setupMobileInput = function() {
+        const currentCommandElement = document.getElementById('current-command');
+        const mobileInputElement = document.getElementById('mobile-input');
+
+        if (currentCommandElement && mobileInputElement) {
+            // Clear any existing event listeners by removing and re-adding the input
+            const newInput = mobileInputElement.cloneNode(true);
+            mobileInputElement.parentNode.replaceChild(newInput, mobileInputElement);
+
+            // Set up input event handler
+            newInput.addEventListener('input', function(e) {
+                const text = e.target.value;
+                if (window.updateCommandText) {
+                    window.updateCommandText(text, text.length);
+                }
+            });
+
+            newInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const commandText = currentCommandElement.textContent.trim();
+
+                    // Store this in the global command history
+                    if (!window.commandHistory) window.commandHistory = [];
+                    if (!window.currentCommand) window.currentCommand = 0;
+
+                    window.commandHistory.push(commandText);
+                    window.currentCommand = window.commandHistory.length;
+
+                    // Execute the command using the main terminal logic
+                    if (window.executeCommand && window.preserveCurrentCommand && window.addNewCommandLine) {
+                        window.preserveCurrentCommand(document.getElementById('terminal-content'));
+                        const output = window.executeCommand(commandText, commands);
+
+                        if (commandText === 'clear') {
+                            const terminal = document.getElementById('terminal-content');
+                            const commandOutputs = terminal.querySelectorAll('.command-output:not(:first-child)');
+                            commandOutputs.forEach(output => output.remove());
+                            const commandLines = terminal.querySelectorAll('.command-line');
+                            commandLines.forEach(line => line.remove());
+                        } else if (commandText === 'easy_mode') {
+                            window.location.href = '../Simpler-Portfolio/Simple.html';
+                            return;
+                        } else if (output) {
+                            const terminal = document.getElementById('terminal-content');
+                            const executedCommand = terminal.querySelector('.command-line.executed:last-child');
+                            if (executedCommand) {
+                                executedCommand.insertAdjacentHTML('afterend', output);
+                            } else {
+                                terminal.insertAdjacentHTML('beforeend', output);
+                            }
+                            window.terminalUtils.smartAutoScrollWithContentDetection();
+                        }
+
+                        window.addNewCommandLine(document.getElementById('terminal-content'));
+
+                        // Reset cursor position
+                        if (window.cursorPosition !== undefined) {
+                            window.cursorPosition = 0;
+                        }
+
+                        window.terminalUtils.scrollToBottom();
+
+                        // Clear the input
+                        e.target.value = '';
+
+                        // Set up mobile input for the new command line
+                        setTimeout(() => {
+                            window.setupMobileInput();
+                            // Re-focus on mobile
+                            const newMobileInput = document.getElementById('mobile-input');
+                            if (newMobileInput && 'ontouchstart' in window) {
+                                newMobileInput.focus();
+                            }
+                        }, 100);
+                    }
+                } else if (e.key === 'Backspace') {
+                    setTimeout(() => {
+                        const text = e.target.value;
+                        if (window.updateCommandText) {
+                            window.updateCommandText(text, text.length);
+                        }
+                    }, 1);
+                }
+            });
+
+            // Set up focus handling
+            currentCommandElement.addEventListener('click', function(e) {
+                e.preventDefault();
+                newInput.focus();
+            });
+
+            currentCommandElement.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                newInput.focus();
+            });
+        }
+    };
+
+    // Store global references
+    window.updateCommandText = updateCommandText;
+    window.executeCommand = executeCommand;
+    window.preserveCurrentCommand = preserveCurrentCommand;
+    window.addNewCommandLine = addNewCommandLine;
+    window.commandHistory = commandHistory;
+    window.currentCommand = currentCommand;
+
+    // Set up mobile input initially
+    setTimeout(() => {
+        window.setupMobileInput();
+    }, 100);
 });
 
 // Generate star field background

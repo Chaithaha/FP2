@@ -49,37 +49,11 @@ function addNewCommandLine(terminal) {
     `;
     terminal.insertAdjacentHTML('beforeend', commandLineHTML);
 
-    // Re-initialize mobile input handling for the new command line
-    reinitializeMobileInput();
-}
-
-// Function to reinitialize mobile input handling
-function reinitializeMobileInput() {
-    const currentCommandElement = document.getElementById('current-command');
-    const mobileInputElement = document.getElementById('mobile-input');
-
-    if (currentCommandElement && mobileInputElement) {
-        currentCommandElement.setAttribute('tabindex', '0');
-        currentCommandElement.setAttribute('role', 'textbox');
-        currentCommandElement.setAttribute('aria-label', 'Terminal command input');
-
-        // Handle focus management
-        currentCommandElement.addEventListener('click', function(e) {
-            e.preventDefault();
-            mobileInputElement.focus();
-        });
-
-        currentCommandElement.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            mobileInputElement.focus();
-        });
-
-        // Auto-focus on mobile
-        if ('ontouchstart' in window) {
-            setTimeout(() => {
-                mobileInputElement.focus();
-            }, 100);
-        }
+    // Set up mobile input handling for the new command line
+    if (typeof window.setupMobileInput === 'function') {
+        setTimeout(() => {
+            window.setupMobileInput();
+        }, 50);
     }
 }
 
