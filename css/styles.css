@@ -1082,3 +1082,54 @@ body {
         line-height: 1.4;
     }
 }
+
+/* Scroll to bottom button for mobile */
+.scroll-to-bottom-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: #27c93f;
+    border: 2px solid #27c93f;
+    border-radius: 50%;
+    color: #0d1117;
+    cursor: pointer;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(39, 201, 63, 0.3);
+}
+
+.scroll-to-bottom-btn:hover {
+    background-color: #0d1117;
+    color: #27c93f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(39, 201, 63, 0.4);
+}
+
+.scroll-to-bottom-btn:active {
+    transform: translateY(0);
+}
+
+.scroll-to-bottom-btn i {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.5;
+}
+
+/* Show button only on mobile devices */
+@media (hover: none) and (pointer: coarse) {
+    .scroll-to-bottom-btn {
+        display: flex;
+    }
+}
+
+/* Also show on small screens */
+@media (max-width: 768px) {
+    .scroll-to-bottom-btn {
+        display: flex;
+    }
+}

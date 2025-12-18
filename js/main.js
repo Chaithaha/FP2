@@ -539,6 +539,24 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         window.setupMobileInput();
     }, 100);
+
+    // Set up scroll-to-bottom button
+    const scrollToBottomBtn = document.getElementById('scroll-to-bottom');
+    if (scrollToBottomBtn) {
+        // Scroll to bottom function
+        const scrollToBottom = () => {
+            const terminalBody = document.getElementById('terminal-content');
+            if (terminalBody) {
+                terminalBody.scrollTop = terminalBody.scrollHeight;
+            }
+        };
+
+        // Add click event listener
+        scrollToBottomBtn.addEventListener('click', scrollToBottom);
+
+        // Re-initialize feather icons for the button
+        feather.replace();
+    }
 });
 
 // Generate star field background
