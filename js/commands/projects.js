@@ -113,7 +113,7 @@ export const projects = {
                     ` : ''}
                     
                     <p class="text-gray-400 mb-2">${project.description}</p>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2" style="overflow-wrap: break-word; word-wrap: break-word;">
                         ${project.technologies.map(tech => `<span class="skill-tag">${tech}</span>`).join('')}
                     </div>
                 </div>

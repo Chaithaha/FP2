@@ -1169,4 +1169,60 @@ body {
         position: relative;
         z-index: 1;
     }
+
+    /* Fix project cards overflow on mobile */
+    .project-card {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Fix skill tags overflow on mobile */
+    .skill-tag {
+        display: inline-block;
+        max-width: calc(100% - 0.5rem);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        margin: 0.15rem;
+        word-wrap: normal;
+        vertical-align: top;
+    }
+
+    /* Flex container for technologies */
+    .flex.gap-2 {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        align-items: flex-start;
+    }
+
+    /* Make technology tags wrap properly */
+    .flex.gap-2 .skill-tag {
+        flex: 0 0 auto;
+        max-width: calc(100% - 1rem);
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .skill-tag {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.4rem;
+        margin: 0.1rem;
+        max-width: calc(100% - 0.3rem);
+    }
+
+    .flex.gap-2 {
+        gap: 0.2rem;
+    }
+
+    .project-card {
+        padding: 0.5rem;
+    }
 }
