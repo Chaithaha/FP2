@@ -675,6 +675,18 @@ body {
     outline: none;
 }
 
+/* General command line improvements for all devices */
+.command-line:not(.executed) {
+    position: relative;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 8px 0;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+}
+
 /* Mobile input improvements */
 @media (hover: none) and (pointer: coarse) {
     #current-command {
@@ -714,25 +726,34 @@ body {
         position: relative;
         transition: background-color 0.3s ease;
         border-radius: 4px;
-        padding: 4px 8px;
+        padding: 8px 12px;
         margin: 8px 0;
-        min-height: 40px;
+        min-height: 44px;
         display: flex;
         align-items: center;
+        border: 1px dashed rgba(39, 201, 63, 0.2);
     }
 
+    .command-line:not(.executed).has-text {
+        border-color: rgba(39, 201, 63, 0.5);
+        background-color: rgba(39, 201, 63, 0.05);
+    }
+
+    /* Enhanced hint text positioning */
     .command-line:not(.executed):before {
-        content: "👆 Tap here to type";
+        content: "Type a command...";
         position: absolute;
-        right: 8px;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 11px;
+        font-size: 12px;
         color: #27c93f;
-        opacity: 0.6;
+        opacity: 0.8;
         font-family: 'Fira Code', monospace;
         pointer-events: none;
         animation: pulse 2s ease-in-out infinite;
+        font-style: italic;
+        z-index: 5;
     }
 
     .command-line:not(.executed).has-text:before {
@@ -740,8 +761,14 @@ body {
     }
 
     @keyframes pulse {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 0.8; }
+        0%, 100% {
+            opacity: 0.4;
+            transform: translateY(-50%) scale(1);
+        }
+        50% {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.05);
+        }
     }
 
     /* Active input indicator */

@@ -53,6 +53,15 @@ function addNewCommandLine(terminal) {
     if (typeof window.setupMobileInput === 'function') {
         setTimeout(() => {
             window.setupMobileInput();
+
+            // Ensure the hint is visible for the new command line
+            const newCommandLine = document.querySelector('.command-line:not(.executed)');
+            if (newCommandLine) {
+                // Force a reflow to ensure the pseudo-element shows
+                newCommandLine.style.display = 'none';
+                newCommandLine.offsetHeight; // Force reflow
+                newCommandLine.style.display = '';
+            }
         }, 50);
     }
 }
