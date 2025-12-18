@@ -548,6 +548,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const terminalBody = document.getElementById('terminal-content');
             if (terminalBody) {
                 terminalBody.scrollTop = terminalBody.scrollHeight;
+
+                // Focus on the current command input after scrolling
+                setTimeout(() => {
+                    const currentCommandElement = getCurrentCommandElement();
+                    if (currentCommandElement) {
+                        // For mobile, focus on the hidden mobile input
+                        const mobileInput = document.getElementById('mobile-input');
+                        if (mobileInput) {
+                            mobileInput.focus();
+                        }
+                        // For desktop, click on the command element to trigger focus
+                        currentCommandElement.click();
+                    }
+                }, 100);
             }
         };
 
