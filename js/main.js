@@ -185,8 +185,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Add new command line (this will remove the old one)
             addNewCommandLine(terminal);
-            // Reset cursor position for new command
+            // Reset cursor position for new command and initialize it
             cursorPosition = 0;
+            updateCommandText('', 0);
 
             // Enhanced scrolling for both desktop and mobile
             setTimeout(() => {
@@ -324,6 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 addNewCommandLine(terminal);
                 cursorPosition = 0;
+                updateCommandText('', 0);
                 window.terminalUtils.scrollToBottom();
 
                 // Clear mobile input
@@ -442,9 +444,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         window.addNewCommandLine(document.getElementById('terminal-content'));
 
-                        // Reset cursor position
+                        // Reset cursor position and initialize it
                         if (window.cursorPosition !== undefined) {
                             window.cursorPosition = 0;
+                        }
+                        if (window.updateCommandText) {
+                            window.updateCommandText('', 0);
                         }
 
                         // Clear the input
