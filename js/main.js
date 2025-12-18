@@ -192,7 +192,49 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset cursor position for new command
             cursorPosition = 0;
 
-            window.terminalUtils.scrollToBottom();
+            // Enhanced scrolling for both desktop and mobile
+            setTimeout(() => {
+                if ('ontouchstart' in window) {
+                    // Mobile-specific enhanced scrolling
+                    const terminalBody = document.querySelector('.terminal-body');
+                    if (terminalBody) {
+                        // Force scroll to bottom immediately
+                        terminalBody.scrollTop = terminalBody.scrollHeight;
+
+                        // Additional scroll after a small delay to ensure it works
+                        setTimeout(() => {
+                            terminalBody.scrollTop = terminalBody.scrollHeight;
+
+                            // Highlight and activate the new command line on mobile
+                            const newCommandLine = document.querySelector('.command-line:not(.executed)');
+                            if (newCommandLine) {
+                                newCommandLine.classList.add('active');
+
+                                // Remove the active class after a delay
+                                setTimeout(() => {
+                                    newCommandLine.classList.remove('active');
+                                }, 2000);
+                            }
+
+                            // Re-setup mobile input for the new command line
+                            if (typeof window.setupMobileInput === 'function') {
+                                window.setupMobileInput();
+
+                                // Focus on mobile
+                                setTimeout(() => {
+                                    const newMobileInput = document.getElementById('mobile-input');
+                                    if (newMobileInput) {
+                                        newMobileInput.focus();
+                                    }
+                                }, 100);
+                            }
+                        }, 150);
+                    }
+                } else {
+                    // Desktop scrolling
+                    window.terminalUtils.scrollToBottom();
+                }
+            }, 100);
         } else if (e.key === 'Backspace') {
             e.preventDefault();
             deleteAtCursor();
@@ -353,6 +395,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.updateCommandText) {
                     window.updateCommandText(text, text.length);
                 }
+
+                // Update has-text class on the command line
+                const commandLine = currentCommandElement.closest('.command-line');
+                if (commandLine) {
+                    if (text.trim()) {
+                        commandLine.classList.add('has-text');
+                    } else {
+                        commandLine.classList.remove('has-text');
+                    }
+                }
             });
 
             newInput.addEventListener('keydown', function(e) {
@@ -399,19 +451,56 @@ document.addEventListener('DOMContentLoaded', function() {
                             window.cursorPosition = 0;
                         }
 
-                        window.terminalUtils.scrollToBottom();
-
                         // Clear the input
                         e.target.value = '';
 
-                        // Set up mobile input for the new command line
+                        // Remove has-text class since input is now empty
+                        const currentCommandLine = currentCommandElement.closest('.command-line');
+                        if (currentCommandLine) {
+                            currentCommandLine.classList.remove('has-text');
+                        }
+
+                        // Enhanced mobile auto-scroll and focus
                         setTimeout(() => {
-                            window.setupMobileInput();
-                            // Re-focus on mobile
-                            const newMobileInput = document.getElementById('mobile-input');
-                            if (newMobileInput && 'ontouchstart' in window) {
-                                newMobileInput.focus();
+                            // Scroll to the new command line and make it visible
+                            if ('ontouchstart' in window) {
+                                // Mobile-specific scrolling
+                                const terminalBody = document.querySelector('.terminal-body');
+                                if (terminalBody) {
+                                    // Force scroll to bottom immediately
+                                    terminalBody.scrollTop = terminalBody.scrollHeight;
+
+                                    // Additional scroll after a small delay to ensure it works
+                                    setTimeout(() => {
+                                        terminalBody.scrollTop = terminalBody.scrollHeight;
+
+                                        // Highlight and activate the new command line on mobile
+                                        const newCommandLine = document.querySelector('.command-line:not(.executed)');
+                                        if (newCommandLine) {
+                                            newCommandLine.classList.add('active');
+
+                                            // Remove the active class after a delay
+                                            setTimeout(() => {
+                                                newCommandLine.classList.remove('active');
+                                            }, 2000);
+                                        }
+                                    }, 150);
+                                }
+                            } else {
+                                // Desktop scrolling
+                                window.terminalUtils.scrollToBottom();
                             }
+
+                            // Set up mobile input for the new command line
+                            window.setupMobileInput();
+
+                            // Re-focus on mobile with a delay to ensure scrolling is complete
+                            setTimeout(() => {
+                                const newMobileInput = document.getElementById('mobile-input');
+                                if (newMobileInput && 'ontouchstart' in window) {
+                                    newMobileInput.focus();
+                                }
+                            }, 200);
                         }, 100);
                     }
                 } else if (e.key === 'Backspace') {

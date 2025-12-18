@@ -679,7 +679,7 @@ body {
 @media (hover: none) and (pointer: coarse) {
     #current-command {
         min-height: 24px;
-        padding: 2px 0;
+        padding: 4px 0;
         cursor: text;
         position: relative;
         z-index: 10;
@@ -706,6 +706,56 @@ body {
         position: absolute;
         left: -9999px;
         opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Enhanced mobile command line styling */
+    .command-line:not(.executed) {
+        position: relative;
+        transition: background-color 0.3s ease;
+        border-radius: 4px;
+        padding: 4px 8px;
+        margin: 8px 0;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+    }
+
+    .command-line:not(.executed):before {
+        content: "👆 Tap here to type";
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 11px;
+        color: #27c93f;
+        opacity: 0.6;
+        font-family: 'Fira Code', monospace;
+        pointer-events: none;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .command-line:not(.executed).has-text:before {
+        content: "";
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+    }
+
+    /* Active input indicator */
+    .command-line:not(.executed).active {
+        background-color: rgba(39, 201, 63, 0.1);
+        box-shadow: 0 0 0 1px rgba(39, 201, 63, 0.2);
+    }
+
+    /* Scroll indicator at bottom */
+    .terminal-body:after {
+        content: "";
+        display: block;
+        height: 60px;
+        width: 100%;
         pointer-events: none;
     }
 }
